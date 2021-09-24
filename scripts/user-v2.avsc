@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "namespace": "com.picpay.apicurio.spike.user.avro",
+  "name": "User",
+  "fields": [
+    {
+      "name": "name",
+      "type": "string"
+    },
+    {
+      "name": "age",
+      "type": "int"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+application:
+  name: user-producer
+server:
+  port: 8081

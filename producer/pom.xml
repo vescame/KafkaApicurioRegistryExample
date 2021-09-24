@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+<!--	<parent>-->
+<!--		<groupId>org.springframework.boot</groupId>-->
+<!--		<artifactId>spring-boot-starter-parent</artifactId>-->
+<!--		<version>2.5.5</version>-->
+<!--		<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;-->
+<!--	</parent>-->
+	<parent>
+		<groupId>com.picpay.apicurio.spike.user</groupId>
+		<artifactId>kafka-apicurio-registry</artifactId>
+		<version>1.0.0.SNAPSHOT</version>
+	</parent>
+
+	<artifactId>producer</artifactId>
+	<name>producer</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>Apicurio Registry with Kafka and Avro</description>
+
+<!--	<properties>-->
+<!--		<java.version>11</java.version>-->
+<!--		<kotlin.version>1.5.31</kotlin.version>-->
+<!--	</properties>-->
+
+<!--	<dependencies>-->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-web</artifactId>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>com.fasterxml.jackson.module</groupId>-->
+<!--			<artifactId>jackson-module-kotlin</artifactId>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.jetbrains.kotlin</groupId>-->
+<!--			<artifactId>kotlin-reflect</artifactId>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.jetbrains.kotlin</groupId>-->
+<!--			<artifactId>kotlin-stdlib-jdk8</artifactId>-->
+<!--		</dependency>-->
+
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-test</artifactId>-->
+<!--			<scope>test</scope>-->
+<!--		</dependency>-->
+<!--	</dependencies>-->
+
+	<build>
+		<sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+		<testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.jetbrains.kotlin</groupId>
+				<artifactId>kotlin-maven-plugin</artifactId>
+				<configuration>
+					<args>
+						<arg>-Xjsr305=strict</arg>
+					</args>
+					<compilerPlugins>
+						<plugin>spring</plugin>
+					</compilerPlugins>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.jetbrains.kotlin</groupId>
+						<artifactId>kotlin-maven-allopen</artifactId>
+						<version>${kotlin.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+<!-- Initialy download the registry schema and then generate the Avro Class -->
+<!--			Apicurio Schema Download: mvn generate-sources -->
+			<plugin>
+				<groupId>io.apicurio</groupId>
+				<artifactId>apicurio-registry-maven-plugin</artifactId>
+				<version>2.0.1.Final</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>download</goal>
+						</goals>
+						<configuration>
+							<registryUrl>http://localhost:8080/apis/registry/v2</registryUrl>
+							<artifacts>
+								<artifact>
+									<artifactId>User</artifactId>
+									<groupId>com.picpay.apicurio.spike.user</groupId>
+									<file>${project.basedir}/src/main/resources/avro/User.avsc</file>
+									<overwrite>true</overwrite>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+<!--			AVRO: mvn generate-sources -->
+			<plugin>
+				<groupId>org.apache.avro</groupId>
+				<artifactId>avro-maven-plugin</artifactId>
+				<version>1.10.2</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>schema</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>${project.basedir}/src/main/resources/avro</sourceDirectory>
+							<outputDirectory>${project.basedir}/src/main/kotlin</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
